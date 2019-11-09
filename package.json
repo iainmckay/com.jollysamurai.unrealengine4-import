@@ -1,0 +1,20 @@
+{
+  "name": "com.jollysamurai.unrealengine4-import",
+  "version": "1.0.0",
+  "displayName": "UnrealEngine4 Import",
+  "description": "Import assets from UnrealEngine 4",
+  "unity": "2020.1",
+  "unityRelease": "0a11",
+  "keywords": [
+    "ue4",
+    "unreal",
+    "unrealengine",
+    "import"
+  ],
+  "author": {
+    "name": "Iain Mckay",
+    "email": "me@iainmckay.co.uk",
+    "url": "http://www.iainmckay.co.uk"
+  },
+  "type": "tool"
+}
