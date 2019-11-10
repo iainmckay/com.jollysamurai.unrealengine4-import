@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions;
 using JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Functions;
 using JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Roots;
+using JollySamurai.UnrealEngine4.T3D;
 using UnityEditor.Graphing;
 using UnityEditor.Graphs;
 using UnityEditor.ShaderGraph;
@@ -74,6 +75,21 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
                 ConvertUnrealNode(childNode);
             }
 
+            foreach (var unresolvedExpression in _unrealMaterial.Expressions) {
+                var childNode = _unrealMaterial.ResolveExpressionReference(unresolvedExpression);
+                
+                if(null == childNode) {
+                    // FIXME:
+                    Debug.Log("unresolved expression");
+
+                    continue;
+                }
+
+                ConnectUnrealNode(childNode);
+            }
+
+            ConnectUnrealNode(_unrealMaterial);
+
             return _graph;
         }
 
@@ -83,12 +99,31 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
             converter?.Convert(unrealNode, this);
         }
 
+        public void ConnectUnrealNode(T3D.Node unrealNode)
+        {
+            var converter = FindConverterForUnrealNode(unrealNode);
+            converter?.CreateConnections(unrealNode, _unrealMaterial, this);
+        }
+        
         public UnrealNodeConverter FindConverterForUnrealNode(T3D.Node unrealNode)
         {
             foreach (var converter in _nodeConverters) {
                 if(converter.CanConvert(unrealNode)) {
                     return converter;
                 }
+            }
+
+            return null;
+        }
+
+        public AbstractMaterialNode FindNodeByUnrealName(string unrealName)
+        {
+            if(string.IsNullOrEmpty(unrealName)) {
+                return null;
+            }
+
+            if(_nodeLookupByUnrealNodeName.ContainsKey(unrealName)) {
+                return _nodeLookupByUnrealNodeName[unrealName];
             }
 
             return null;
@@ -134,6 +169,20 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
         {
             _graph.Connect(from, to);
         }
+        
+        public void Connect(string fromUnrealNodeName, string toUnrealNodeName, int toSlotId, ExpressionReference expressionReference)
+        {
+            var fromNode = FindNodeByUnrealName(fromUnrealNodeName);
+            var toNode = FindNodeByUnrealName(toUnrealNodeName);
+            var fromSlotId = FindSlotId(fromUnrealNodeName, toUnrealNodeName, toSlotId, expressionReference);
+
+            if(fromNode != null && toNode != null && fromSlotId != -1) {
+                Connect(
+                    fromNode.GetSlotReference(fromSlotId),
+                    toNode.GetSlotReference(toSlotId)
+                );
+            }
+        }
 
         public delegate void ConfigureShaderPropertyDelegate<T>(T shaderProperty)
             where T : AbstractShaderProperty;
@@ -161,6 +210,37 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
             }
 
             return property;
+        }
+
+        public int FindSlotId(string fromUnrealName, string toUnrealName, int toSlotId, ExpressionReference expressionReference)
+        {
+            var fromUnrealNode = _unrealMaterial.FindChildByName(fromUnrealName);
+            var fromNode = FindNodeByUnrealName(fromUnrealName);
+            var toNode = FindNodeByUnrealName(toUnrealName);
+
+            if(fromUnrealNode == null || fromNode == null || toNode == null) {
+                return -1;
+            }
+
+            foreach (var converter in _nodeConverters) {
+                if(converter.CanConvert(fromUnrealNode)) {
+                    return converter.GetConnectionSlotId(fromNode, toNode, toSlotId, expressionReference);
+                }
+            }
+
+            return -1;
+        }
+
+        public T FindSlot<T>(string fromUnrealName, string toUnrealName, int toSlotId, ExpressionReference expressionReference) where T : ISlot
+        {
+            var slotId = FindSlotId(fromUnrealName, toUnrealName, toSlotId, expressionReference);
+            var fromNode = FindNodeByUnrealName(fromUnrealName);
+
+            if(slotId == -1) {
+                return default;
+            }
+
+            return fromNode.FindSlot<T>(slotId);
         }
 
         public static GraphData FromMaterial(Material material)

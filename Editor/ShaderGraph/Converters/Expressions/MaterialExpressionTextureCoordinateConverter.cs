@@ -20,5 +20,10 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
                 previewExpanded = ! unrealNode.Collapsed,
             };
         }
+
+        public override int GetConnectionSlotId(AbstractMaterialNode from, AbstractMaterialNode to, int toSlotId, ExpressionReference expressionReference)
+        {
+            return UVNode.OutputSlotId;
+        }
     }
 }

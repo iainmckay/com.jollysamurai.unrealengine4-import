@@ -6,7 +6,7 @@ using UnityEditor.ShaderGraph.Internal;
 
 namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Functions
 {
-    public class MaterialFunctionBlendAngleCorrectedNormalsConverter : GenericConverter<MaterialExpressionMaterialFunctionCall>
+    public class MaterialFunctionBlendAngleCorrectedNormalsConverter : GenericFunctionConverter
     {
         public override bool CanConvert(Node unrealNode)
         {
@@ -16,6 +16,20 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Functions
         protected override AbstractMaterialNode CreateNode(ShaderGraphBuilder builder, MaterialExpressionMaterialFunctionCall unrealNode)
         {
             return new NormalBlendNode();
+        }
+
+        protected override int GetConnectionIdSlotForFunctionInput(string inputName, Node functionNode)
+        {
+            switch (inputName) {
+                case "BaseNormal":
+                    return 0;
+
+                case "AdditionalNormal":
+                    return 1;
+            }
+
+            // FIXME:
+            throw new Exception("unhandled function call input");
         }
     }
 }

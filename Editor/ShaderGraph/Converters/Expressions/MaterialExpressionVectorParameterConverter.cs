@@ -24,5 +24,22 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
                 );
             });
         }
+
+        public override int GetConnectionSlotId(AbstractMaterialNode from, AbstractMaterialNode to, int toSlotId, ExpressionReference expressionReference)
+        {
+            var propertyBag = expressionReference.Properties;
+
+            var hasR = propertyBag.HasProperty("MaskR");
+            var hasG = propertyBag.HasProperty("MaskG");
+            var hasB = propertyBag.HasProperty("MaskB");
+            var hasA = propertyBag.HasProperty("MaskA");
+
+            if (hasA || ! hasR || ! hasG || ! hasB) {
+                // FIXME:
+                throw new Exception("unhandled vector parameter mask");
+            }
+
+            return PropertyNode.OutputSlotId;
+        }
     }
 }

@@ -19,5 +19,17 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
                 previewExpanded = false,
             };
         }
+
+        public override int GetConnectionSlotId(AbstractMaterialNode from, AbstractMaterialNode to, int toSlotId, ExpressionReference expressionReference)
+        {
+            return 3;
+        }
+
+        public override void CreateConnections(MaterialExpressionClamp unrealNode, Material unrealMaterial, ShaderGraphBuilder builder)
+        {
+            builder.Connect(unrealNode.Input?.NodeName, unrealNode.Name, 0, unrealNode.Input);
+            builder.Connect(unrealNode.Min?.NodeName, unrealNode.Name, 1, unrealNode.Min);
+            builder.Connect(unrealNode.Max?.NodeName, unrealNode.Name, 2, unrealNode.Max);
+        }
     }
 }

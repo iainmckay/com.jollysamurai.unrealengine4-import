@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEditor.ShaderGraph;
 using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
+using Material = JollySamurai.UnrealEngine4.T3D.Material.Material;
 using TextureType = UnityEditor.ShaderGraph.TextureType;
 
 namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
@@ -49,6 +50,37 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
             );
 
             return sampleNode;
+        }
+
+        public override int GetConnectionSlotId(AbstractMaterialNode from, AbstractMaterialNode to, int toSlotId, ExpressionReference expressionReference)
+        {
+            var propertyBag = expressionReference.Properties;
+
+            var hasR = propertyBag.HasProperty("MaskR");
+            var hasG = propertyBag.HasProperty("MaskG");
+            var hasB = propertyBag.HasProperty("MaskB");
+            var hasA = propertyBag.HasProperty("MaskA");
+
+            if (hasR && hasG && hasB && hasA) {
+                return SampleTexture2DNode.OutputSlotRGBAId;
+            }  else if (hasR && hasG && hasB) {
+                // should this be only RGB instead?
+                return SampleTexture2DNode.OutputSlotRGBAId;
+            } else if (hasR) {
+                return SampleTexture2DNode.OutputSlotRId;
+            } else if (hasG) {
+                return SampleTexture2DNode.OutputSlotGId;
+            } else if (hasB) {
+                return SampleTexture2DNode.OutputSlotBId;
+            }
+
+            // FIXME:
+            throw new Exception("unhandled scenario");
+        }
+
+        public override void CreateConnections(MaterialExpressionTextureSampleParameter2D unrealNode, Material unrealMaterial, ShaderGraphBuilder builder)
+        {
+            builder.Connect(unrealNode.Coordinates?.NodeName, unrealNode.Name, SampleTexture2DNode.UVInput, unrealNode.Coordinates);
         }
     }
 }

@@ -17,5 +17,16 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
         {
             return new MultiplyNode();
         }
+
+        public override int GetConnectionSlotId(AbstractMaterialNode from, AbstractMaterialNode to, int toSlotId, ExpressionReference expressionReference)
+        {
+            return 2;
+        }
+
+        public override void CreateConnections(MaterialExpressionMultiply unrealNode, Material unrealMaterial, ShaderGraphBuilder builder)
+        {
+            builder.Connect(unrealNode.A?.NodeName, unrealNode.Name, 0, unrealNode.A);
+            builder.Connect(unrealNode.B?.NodeName, unrealNode.Name, 1, unrealNode.B);
+        }
     }
 }
