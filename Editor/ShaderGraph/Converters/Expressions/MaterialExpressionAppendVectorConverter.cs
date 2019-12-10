@@ -32,8 +32,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
                 return 4;
             }
 
-            // FIXME:
-            throw new System.Exception("unhandled vector type");
+            throw new System.Exception("FIXME: unhandled vector type");
         }
 
         public override void CreateConnections(MaterialExpressionAppendVector unrealNode, Material unrealMaterial, ShaderGraphBuilder builder)
@@ -52,8 +51,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
                 } else if(aSlot.concreteValueType == ConcreteSlotValueType.Vector1) {
                     builder.Connect(a?.Name, unrealNode.Name, 0, unrealNode.A);
                 } else {
-                    // FIXME:
-                    throw new System.Exception("unhandled vector type");
+                    throw new System.Exception("FIXME: unhandled vector type");
                 }
             }
 
@@ -71,8 +69,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
                 } else if(aSlot.concreteValueType == ConcreteSlotValueType.Vector1) {
                     builder.Connect(a?.Name, unrealNode.Name, 1, unrealNode.B);
                 } else {
-                    // FIXME:
-                    throw new System.Exception("unhandled vector type");
+                    throw new System.Exception("FIXME: unhandled vector type");
                 }
             }
         }
