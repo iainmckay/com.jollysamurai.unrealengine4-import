@@ -24,7 +24,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
         {
             var toSlot = to.FindInputSlot<MaterialSlot>(toSlotId);
 
-            if(toSlot.concreteValueType == ConcreteSlotValueType.Vector2) {
+            if(toSlot.concreteValueType == ConcreteSlotValueType.Vector1 || toSlot.concreteValueType == ConcreteSlotValueType.Vector2) {
                 return 6;
             } else if(toSlot.concreteValueType == ConcreteSlotValueType.Vector3) {
                 return 5;
