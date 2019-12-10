@@ -41,7 +41,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
               sampleNode.textureType = TextureType.Default;
             } else {
               // FIXME:
-              throw new Exception("unhandled texture type");
+              throw new System.Exception("unhandled texture type");
             }
 
             builder.Connect(
@@ -75,7 +75,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
             }
 
             // FIXME:
-            throw new Exception("unhandled scenario");
+            throw new System.Exception("unhandled scenario");
         }
 
         public override void CreateConnections(MaterialExpressionTextureSampleParameter2D unrealNode, Material unrealMaterial, ShaderGraphBuilder builder)

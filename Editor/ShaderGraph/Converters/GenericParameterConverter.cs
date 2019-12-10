@@ -16,7 +16,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters
 
             if(parameterNode == null) {
                 // FIXME:
-                throw new Exception("Unexpected node type");
+                throw new System.Exception("Unexpected node type");
             }
 
             var shaderInput = CreateShaderInput(parameterNode, builder);

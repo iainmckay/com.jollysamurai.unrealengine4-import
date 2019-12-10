@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions;
 using JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Functions;
 using JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Roots;
 using JollySamurai.UnrealEngine4.T3D;
 using UnityEditor.Graphing;
-using UnityEditor.Graphs;
 using UnityEditor.ShaderGraph;
 using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
@@ -67,7 +65,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
 
                 if(null == childNode) {
                     // FIXME:
-                    Debug.Log("unresolved expression");
+                    Debug.Log("FIXME: unresolved expression");
 
                     continue;
                 }
@@ -80,7 +78,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
                 
                 if(null == childNode) {
                     // FIXME:
-                    Debug.Log("unresolved expression");
+                    Debug.Log("FIXME: unresolved expression");
 
                     continue;
                 }

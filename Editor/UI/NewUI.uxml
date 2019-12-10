@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:Template name="ImportToolbar" src="/Packages/com.jollysamurai.unrealengine4-import/Editor/UI/ImportToolbar.uxml" />
+    <ui:Instance template="ImportToolbar" />
+    <ui:ListView focusable="True">
+        <Style src="NewUI.uss" />
+    </ui:ListView>
+
+    <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: center; font-size: 24px; flex-direction: column; display: none;">
+        <Style src="NewUI.uss" />
+        <ui:VisualElement style="flex-direction: row; border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-top-left-radius: 10px; border-bottom-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-left-color: rgb(142, 141, 141); border-right-color: rgb(142, 141, 141); border-top-color: rgb(142, 141, 141); border-bottom-color: rgb(142, 141, 141); padding-left: 20px; padding-right: 20px; padding-top: 20px; padding-bottom: 20px;">
+            <ui:Button text="Select" style="font-size: 24px; color: rgb(142, 141, 141);" />
+            <ui:Label text="or Drop File/Folder" style="align-items: stretch; color: rgb(142, 141, 141);" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

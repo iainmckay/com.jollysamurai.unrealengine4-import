@@ -1,0 +1,24 @@
+﻿.ue4-import__toolbar-label {
+    justify-content: center;
+    margin-left: 0;
+    align-items: auto;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.ue4-import__toolbar {
+    justify-content: center;
+    -unity-text-align: middle-left;
+    align-items: stretch;
+}
+
+.ue4-import__toolbar-flex-space {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    flex-grow: 1;
+}
+
+.ue4-import__toolbar-search {
+    margin-right: 5px;
+    margin-left: 5px;
+}

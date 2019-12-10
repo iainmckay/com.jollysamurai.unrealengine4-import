@@ -33,7 +33,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
             }
 
             // FIXME:
-            throw new Exception("unhandled vector type");
+            throw new System.Exception("unhandled vector type");
         }
 
         public override void CreateConnections(MaterialExpressionAppendVector unrealNode, Material unrealMaterial, ShaderGraphBuilder builder)
@@ -53,7 +53,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
                     builder.Connect(a?.Name, unrealNode.Name, 0, unrealNode.A);
                 } else {
                     // FIXME:
-                    throw new Exception("unhandled vector type");
+                    throw new System.Exception("unhandled vector type");
                 }
             }
 
@@ -72,7 +72,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
                     builder.Connect(a?.Name, unrealNode.Name, 1, unrealNode.B);
                 } else {
                     // FIXME:
-                    throw new Exception("unhandled vector type");
+                    throw new System.Exception("unhandled vector type");
                 }
             }
         }

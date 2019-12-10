@@ -36,7 +36,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
 
             if (hasA || ! hasR || ! hasG || ! hasB) {
                 // FIXME:
-                throw new Exception("unhandled vector parameter mask");
+                throw new System.Exception("unhandled vector parameter mask");
             }
 
             return PropertyNode.OutputSlotId;

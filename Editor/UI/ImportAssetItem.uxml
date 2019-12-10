@@ -1,0 +1,5 @@
+﻿<UXML xmlns="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <VisualElement style="height: 50px;">
+        <Label text="<filename>" binding-path="Name"/>
+    </VisualElement>
+</UXML>

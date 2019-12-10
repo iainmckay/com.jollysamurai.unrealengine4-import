@@ -29,7 +29,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Functions
             }
 
             // FIXME:
-            throw new Exception("unhandled function call input");
+            throw new System.Exception("unhandled function call input");
         }
     }
 }

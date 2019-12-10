@@ -1,0 +1,9 @@
+﻿<UXML xmlns="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <uie:Toolbar class="ue4-import__toolbar">
+        <Style src="./Import.uss" />
+        <Label class="ue4-import__toolbar-label" text="ABC"/>
+        <uie:ToolbarSpacer class="ue4-import__toolbar-flex-space" />
+        <uie:ToolbarSearchField class="ue4-import__toolbar-search" name="search" />
+        <uie:ToolbarToggle name="preview-button" text="Preview" />
+    </uie:Toolbar>
+</UXML>
