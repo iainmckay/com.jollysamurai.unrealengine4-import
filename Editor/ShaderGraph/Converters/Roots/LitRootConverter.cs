@@ -29,6 +29,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Roots
             builder.Connect(unrealNode.Metallic?.NodeName, unrealNode.Name, PBRMasterNode.MetallicSlotId, unrealNode.Metallic);
             builder.Connect(unrealNode.Normal?.NodeName, unrealNode.Name, PBRMasterNode.NormalSlotId, unrealNode.Normal);
             builder.Connect(unrealNode.Roughness?.NodeName, unrealNode.Name, PBRMasterNode.SmoothnessSlotId, unrealNode.Roughness);
+            builder.Connect(unrealNode.EmissiveColor?.NodeName, unrealNode.Name, PBRMasterNode.EmissionSlotId, unrealNode.EmissiveColor);
 
             if(unrealNode.Specular != null) {
                 // FIXME: support specular or at least raise a warning?

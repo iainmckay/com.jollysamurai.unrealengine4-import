@@ -95,7 +95,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
                 var material = result.RootNode;
 
                 resultSetBuilder.AddProcessorProblems(result.Problems, document.FileName);
-                
+
                 if(material == null) {
                     continue;
                 }
