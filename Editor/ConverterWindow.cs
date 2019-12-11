@@ -195,7 +195,7 @@ namespace JollySamurai.UnrealEngine4.Import
                 _stageStepCount = _currentWorkingSet.MaterialCount;
                 _stageNumber = 2;
 
-                _currentWorkingSet.CreateShaderGraphs();
+                ProcessResult(_currentWorkingSet.CreateShaderGraphs(), false);
             } catch (UserCancelledOperation) {
                 Debug.Log("Conversion cancelled by user");
             } finally {
@@ -218,7 +218,7 @@ namespace JollySamurai.UnrealEngine4.Import
             return EditorUtility.DisplayCancelableProgressBar(title + $" (Pass {stage} of {StageCount})", info, progress);
         }
 
-        private bool ProcessResult(WorkingSet.ResultSet resultSet)
+        private bool ProcessResult(WorkingSet.ResultSet resultSet, bool showProblemDialog = true)
         {
             foreach (var problem in resultSet.Problems) {
                 if(problem.Severity == WorkingSet.ProblemSeverity.Fatal) {
@@ -228,7 +228,7 @@ namespace JollySamurai.UnrealEngine4.Import
                 }
             }
 
-            if(resultSet.HasErrors) {
+            if(showProblemDialog && resultSet.HasErrors) {
                 return EditorUtility.DisplayDialog("There were problems", "There were one or more errors, do you want to continue?", "Yes", "No");
             }
 
