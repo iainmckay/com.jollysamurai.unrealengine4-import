@@ -192,7 +192,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
 
             if(! _propertyLookup.ContainsKey(name)) {
                 property = new T {
-                    displayName = name
+                    displayName = name,
                 };
 
                 _graph.AddGraphInput(property);

@@ -6,6 +6,7 @@ using System.Threading;
 using JollySamurai.UnrealEngine4.Import.Exception;
 using JollySamurai.UnrealEngine4.Import.ShaderGraph;
 using JollySamurai.UnrealEngine4.Import.UI;
+using JollySamurai.UnrealEngine4.T3D;
 using JollySamurai.UnrealEngine4.T3D.Material;
 using JollySamurai.UnrealEngine4.T3D.Parser;
 using UnityEditor;
@@ -18,7 +19,7 @@ namespace JollySamurai.UnrealEngine4.Import
 {
     public class ConverterWindow : EditorWindow
     {
-        private const int StageCount = 3;
+        private const int StageCount = 4;
 
         private WorkingSet _currentWorkingSet;
 
@@ -74,7 +75,7 @@ namespace JollySamurai.UnrealEngine4.Import
 
             button.clicked += () => {
                 if(enableMultiSelect) {
-                    var selection = Directory.GetFiles(input.value, "*.t3d", SearchOption.AllDirectories);
+                    var selection = Directory.GetFiles(input.value, "*.T3D", SearchOption.AllDirectories);
 
                     if(selection.Length == 0) {
                         EditorUtility.DisplayDialog("Selection Problem", "Source directory does not contain any T3D files", "OK");
@@ -115,7 +116,7 @@ namespace JollySamurai.UnrealEngine4.Import
                 } else {
                     string selectedFile = EditorUtility.OpenFilePanelWithFilters("Select file", null, new string[] {
                         "T3D files",
-                        "t3d"
+                        "T3D"
                     });
 
                     if(! string.IsNullOrEmpty(selectedFile)) {
@@ -126,6 +127,7 @@ namespace JollySamurai.UnrealEngine4.Import
 
             // FIXME: remove
             input.value = "C:/Users/Iain/Desktop/Test";
+            // input.value = "/home/iain/Seafile/Test";
 
             input.contentContainer.Add(inputBrowserButton);
             row.Add(input);
@@ -156,6 +158,7 @@ namespace JollySamurai.UnrealEngine4.Import
 
             // FIXME: remove
             input.value = "D:/ConverterProject/Assets";
+            // input.value = "/home/iain/Seafile/ConverterProject3/Assets";
 
             input.contentContainer.Add(inputBrowserButton);
             row.Add(input);
@@ -180,27 +183,38 @@ namespace JollySamurai.UnrealEngine4.Import
             try {
                 _currentWorkingSet = new WorkingSet(selection, inputDirectory, outputDirectory);
                 _currentWorkingSet.Step += HandleStep;
-                _currentWorkingSet.Begin();
 
                 if(! ProcessResult(_currentWorkingSet.Parse())) {
                     return;
                 }
 
-                // stageName = "Validating dependencies";
-                // stageStepCount = _currentWorkingSet.MaterialInstanceCount;
-                //
-                // _currentWorkingSet.ValidateDependencies();
-
-                _stageName = "Creating ShaderGraph's from materials";
-                _stageStepCount = _currentWorkingSet.MaterialCount;
+                _stageName = "Validating dependencies";
+                _stageStepCount = _currentWorkingSet.MaterialInstanceCount;
                 _stageNumber = 2;
 
+                if(! ProcessResult(_currentWorkingSet.ValidateDependencies())) {
+                    return;
+                }
+
+                _stageName = "Creating ShaderGraphs";
+                _stageStepCount = _currentWorkingSet.MaterialCount;
+                _stageNumber = 3;
+
+                AssetDatabase.StartAssetEditing();
                 ProcessResult(_currentWorkingSet.CreateShaderGraphs(), false);
+                AssetDatabase.StopAssetEditing();
+
+                _stageName = "Creating Materials";
+                _stageStepCount = _currentWorkingSet.MaterialCount + _currentWorkingSet.MaterialInstanceCount;
+                _stageNumber = 4;
+
+                AssetDatabase.StartAssetEditing();
+                ProcessResult(_currentWorkingSet.CreateMaterials(), false);
             } catch (UserCancelledOperation) {
                 Debug.Log("Conversion cancelled by user");
             } finally {
                 EditorUtility.ClearProgressBar();
-                _currentWorkingSet.End();
+                AssetDatabase.StopAssetEditing();
             }
         }
 

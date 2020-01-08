@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using JollySamurai.UnrealEngine4.T3D;
 using JollySamurai.UnrealEngine4.T3D.Material;
 using UnityEditor;
@@ -21,10 +22,9 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
         {
             return builder.FindOrCreateProperty<Texture2DShaderProperty>(parameterNode.ParameterName, (p) => {
                 // FIXME: don't use unresolved reference directly and don't guess the extension
-                var textureFileName = parameterNode.Texture.FileName;
-                textureFileName = textureFileName.Substring(0, textureFileName.LastIndexOf('.')).Substring(5);
+                var textureFileName = "Assets" + Path.ChangeExtension(parameterNode.Texture.FileName, "tga");
 
-                p.value.texture = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets" + textureFileName + ".tga");
+                p.value.texture = AssetDatabase.LoadAssetAtPath<Texture2D>(textureFileName);
             });
         }
 
