@@ -176,7 +176,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
             }
 
             if(! propertyBag.HasProperty("Expression")) {
-                throw new System.Exception("FIXME: this shouldn't really be possible");
+                return;
             }
 
             var expressionValue = propertyBag.FindPropertyValue("Expression");
