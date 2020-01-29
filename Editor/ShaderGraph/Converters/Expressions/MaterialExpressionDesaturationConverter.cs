@@ -1,6 +1,7 @@
 ﻿using System;
 using JollySamurai.UnrealEngine4.T3D;
 using JollySamurai.UnrealEngine4.T3D.Material;
+using JollySamurai.UnrealEngine4.T3D.Parser;
 using UnityEditor.ShaderGraph;
 using UnityEditor.ShaderGraph.Internal;
 
@@ -20,15 +21,15 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
             };
         }
 
-        public override int GetConnectionSlotId(AbstractMaterialNode from, AbstractMaterialNode to, int toSlotId, ExpressionReference expressionReference)
+        public override int GetConnectionSlotId(AbstractMaterialNode from, AbstractMaterialNode to, int toSlotId, ParsedPropertyBag propertyBag)
         {
             return 2;
         }
 
         public override void CreateConnections(MaterialExpressionDesaturation unrealNode, Material unrealMaterial, ShaderGraphBuilder builder)
         {
-            builder.Connect(unrealNode.Input?.NodeName, unrealNode.Name, 0, unrealNode.Input);
-            builder.Connect(unrealNode.Fraction?.NodeName, unrealNode.Name, 1, unrealNode.Fraction);
+            builder.Connect(unrealNode.Input, unrealNode.Name, 0);
+            builder.Connect(unrealNode.Fraction, unrealNode.Name, 1);
         }
     }
 }

@@ -3,6 +3,7 @@ using JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions;
 using JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Functions;
 using JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Roots;
 using JollySamurai.UnrealEngine4.T3D;
+using JollySamurai.UnrealEngine4.T3D.Parser;
 using UnityEditor.Graphing;
 using UnityEditor.ShaderGraph;
 using UnityEditor.ShaderGraph.Internal;
@@ -75,7 +76,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
 
             foreach (var unresolvedExpression in _unrealMaterial.Expressions) {
                 var childNode = _unrealMaterial.ResolveExpressionReference(unresolvedExpression);
-                
+
                 if(null == childNode) {
                     // FIXME:
                     Debug.Log("FIXME: unresolved expression");
@@ -102,7 +103,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
             var converter = FindConverterForUnrealNode(unrealNode);
             converter?.CreateConnections(unrealNode, _unrealMaterial, this);
         }
-        
+
         public UnrealNodeConverter FindConverterForUnrealNode(T3D.Node unrealNode)
         {
             foreach (var converter in _nodeConverters) {
@@ -167,18 +168,31 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
         {
             _graph.Connect(from, to);
         }
-        
-        public void Connect(string fromUnrealNodeName, string toUnrealNodeName, int toSlotId, ExpressionReference expressionReference)
+
+        public void Connect(ParsedPropertyBag propertyBag, string toUnrealNodeName, int toSlotId)
+        {
+            if(null == propertyBag) {
+                return;
+            }
+
+            if(! propertyBag.HasProperty("Expression")) {
+                throw new System.Exception("FIXME: this shouldn't really be possible");
+            }
+
+            var expressionValue = propertyBag.FindPropertyValue("Expression");
+            var expression = ValueUtil.ParseExpressionReference(expressionValue);
+
+            Connect(expression.NodeName, toUnrealNodeName, toSlotId, propertyBag);
+        }
+
+        public void Connect(string fromUnrealNodeName, string toUnrealNodeName, int toSlotId, ParsedPropertyBag propertyBag)
         {
             var fromNode = FindNodeByUnrealName(fromUnrealNodeName);
             var toNode = FindNodeByUnrealName(toUnrealNodeName);
-            var fromSlotId = FindSlotId(fromUnrealNodeName, toUnrealNodeName, toSlotId, expressionReference);
+            var fromSlotId = FindSlotId(fromUnrealNodeName, toUnrealNodeName, toSlotId, propertyBag);
 
             if(fromNode != null && toNode != null && fromSlotId != -1) {
-                Connect(
-                    fromNode.GetSlotReference(fromSlotId),
-                    toNode.GetSlotReference(toSlotId)
-                );
+                Connect(fromNode.GetSlotReference(fromSlotId), toNode.GetSlotReference(toSlotId));
             }
         }
 
@@ -210,7 +224,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
             return property;
         }
 
-        public int FindSlotId(string fromUnrealName, string toUnrealName, int toSlotId, ExpressionReference expressionReference)
+        public int FindSlotId(string fromUnrealName, string toUnrealName, int toSlotId, ParsedPropertyBag propertyBag)
         {
             var fromUnrealNode = _unrealMaterial.FindChildByName(fromUnrealName);
             var fromNode = FindNodeByUnrealName(fromUnrealName);
@@ -222,16 +236,17 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
 
             foreach (var converter in _nodeConverters) {
                 if(converter.CanConvert(fromUnrealNode)) {
-                    return converter.GetConnectionSlotId(fromNode, toNode, toSlotId, expressionReference);
+                    return converter.GetConnectionSlotId(fromNode, toNode, toSlotId, propertyBag);
                 }
             }
 
             return -1;
         }
 
-        public T FindSlot<T>(string fromUnrealName, string toUnrealName, int toSlotId, ExpressionReference expressionReference) where T : ISlot
+        public T FindSlot<T>(string fromUnrealName, string toUnrealName, int toSlotId, ParsedPropertyBag propertyBag)
+            where T : ISlot
         {
-            var slotId = FindSlotId(fromUnrealName, toUnrealName, toSlotId, expressionReference);
+            var slotId = FindSlotId(fromUnrealName, toUnrealName, toSlotId, propertyBag);
             var fromNode = FindNodeByUnrealName(fromUnrealName);
 
             if(slotId == -1) {
