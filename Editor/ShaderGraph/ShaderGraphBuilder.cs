@@ -50,6 +50,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
             AddNodeConverter(new MaterialFunctionCheapContrastConverter());
 
             AddNodeConverter(new LitRootConverter());
+            AddNodeConverter(new UnlitRootConverter());
         }
 
         private void AddNodeConverter(UnrealNodeConverter converter)
