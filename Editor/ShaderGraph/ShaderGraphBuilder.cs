@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions;
 using JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Functions;
 using JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Roots;
@@ -21,6 +22,8 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
         private readonly Dictionary<string, AbstractMaterialNode> _nodeLookupByUnrealNodeName;
         private readonly List<UnrealNodeConverter> _nodeConverters;
 
+        private readonly Dictionary<Guid, Rect> _groupDimensions;
+
         private ShaderGraphBuilder(Material unrealMaterial)
         {
             _unrealMaterial = unrealMaterial;
@@ -28,6 +31,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
             _propertyLookup = new Dictionary<string, ShaderInputLookup>();
             _nodeLookupByUnrealNodeName = new Dictionary<string, AbstractMaterialNode>();
             _nodeConverters = new List<UnrealNodeConverter>();
+            _groupDimensions = new Dictionary<Guid, Rect>();
 
             AddBuiltinConverters();
         }
@@ -37,6 +41,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
             AddNodeConverter(new MaterialExpressionAddConverter());
             AddNodeConverter(new MaterialExpressionAppendVectorConverter());
             AddNodeConverter(new MaterialExpressionClampConverter());
+            AddNodeConverter(new MaterialExpressionCommentConverter());
             AddNodeConverter(new MaterialExpressionDesaturationConverter());
             AddNodeConverter(new MaterialExpressionLinearInterpolateConverter());
             AddNodeConverter(new MaterialExpressionMultiplyConverter());
@@ -62,35 +67,37 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
         {
             ConvertUnrealNode(_unrealMaterial);
 
-            foreach (var unresolvedExpression in _unrealMaterial.Expressions) {
-                var childNode = _unrealMaterial.ResolveExpressionReference(unresolvedExpression);
-
-                if(null == childNode) {
-                    // FIXME:
-                    Debug.Log("FIXME: unresolved expression");
-
-                    continue;
-                }
-
-                ConvertUnrealNode(childNode);
-            }
-
-            foreach (var unresolvedExpression in _unrealMaterial.Expressions) {
-                var childNode = _unrealMaterial.ResolveExpressionReference(unresolvedExpression);
-
-                if(null == childNode) {
-                    // FIXME:
-                    Debug.Log("FIXME: unresolved expression");
-
-                    continue;
-                }
-
-                ConnectUnrealNode(childNode);
-            }
+            IteratorExpressionReferences(_unrealMaterial.EditorComments, ConvertUnrealNode);
+            IteratorExpressionReferences(_unrealMaterial.Expressions, ConvertUnrealNode);
+            IteratorExpressionReferences(_unrealMaterial.Expressions, ConnectUnrealNode);
 
             ConnectUnrealNode(_unrealMaterial);
 
+            AttachToGroups(_unrealMaterial);
+
             return _graph;
+        }
+
+        private delegate void ExpressionReferenceCallback(T3D.Node node);
+
+        private void IteratorExpressionReferences(ExpressionReference[] references, ExpressionReferenceCallback callback)
+        {
+            if(null == references) {
+                return;
+            }
+
+            foreach (var unresolvedExpression in references) {
+                var childNode = _unrealMaterial.ResolveExpressionReference(unresolvedExpression);
+
+                if(null == childNode) {
+                    // FIXME:
+                    Debug.Log("FIXME: unresolved expression");
+
+                    continue;
+                }
+
+                callback(childNode);
+            }
         }
 
         public void ConvertUnrealNode(T3D.Node unrealNode)
@@ -163,6 +170,14 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
             var drawState = graphNode.drawState;
             drawState.position = new Rect(new Vector2(unrealNode.EditorX, unrealNode.EditorY), Vector2.zero);
             graphNode.drawState = drawState;
+        }
+
+        public void AddGroup(string text, Vector2 position, Vector2 size)
+        {
+            var groupData = new GroupData(text, position);
+
+            _graph.CreateGroup(groupData);
+            _groupDimensions.Add(groupData.guid, Rect.MinMaxRect(position.x, position.y, position.x + size.x, position.y + size.y));
         }
 
         public void Connect(SlotReference from, SlotReference to)
@@ -262,6 +277,19 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
             var converter = new ShaderGraphBuilder(material);
 
             return converter.ToGraphData();
+        }
+
+        private void AttachToGroups(Material unrealMaterial)
+        {
+            foreach (var abstractMaterialNode in _graph.addedNodes) {
+                foreach (var kvp in _groupDimensions) {
+                    if(abstractMaterialNode.drawState.position.Overlaps(kvp.Value)) {
+                        abstractMaterialNode.groupGuid = kvp.Key;
+
+                        break;
+                    }
+                }
+            }
         }
 
         private class ShaderInputLookup
