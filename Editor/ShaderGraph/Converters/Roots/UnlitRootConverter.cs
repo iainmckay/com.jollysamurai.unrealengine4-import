@@ -1,9 +1,8 @@
-﻿using System;
-using JollySamurai.UnrealEngine4.T3D;
+﻿using JollySamurai.UnrealEngine4.T3D;
 using JollySamurai.UnrealEngine4.T3D.Material;
 using JollySamurai.UnrealEngine4.T3D.Parser;
 using UnityEditor.ShaderGraph;
-using UnityEditor.ShaderGraph.Internal;
+using UnityEditor.ShaderGraph.Drawing.Controls;
 
 namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Roots
 {
@@ -16,7 +15,12 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Roots
 
         protected override AbstractMaterialNode CreateNode(ShaderGraphBuilder builder, Material unrealNode)
         {
-            return new UnlitMasterNode();
+            var masterNode = new UnlitMasterNode();
+            masterNode.twoSided = new ToggleData(unrealNode.IsTwoSided);
+            masterNode.surfaceType = Helper.BlendModeToSurfaceType(unrealNode.BlendMode);
+            masterNode.alphaMode = Helper.BlendModeToAlphaMode(unrealNode.BlendMode);
+
+            return masterNode;
         }
 
         public override int GetConnectionSlotId(AbstractMaterialNode from, AbstractMaterialNode to, int toSlotId, ParsedPropertyBag propertyBag)
