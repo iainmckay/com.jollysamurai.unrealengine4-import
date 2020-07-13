@@ -17,7 +17,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
         protected override AbstractMaterialNode CreateNode(ShaderGraphBuilder builder, MaterialExpressionLinearInterpolate unrealNode)
         {
             return new LerpNode {
-                previewExpanded = false,
+                previewExpanded = ! unrealNode.Collapsed,
             };
         }
 

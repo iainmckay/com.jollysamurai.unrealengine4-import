@@ -16,7 +16,9 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
 
         protected override AbstractMaterialNode CreateNode(ShaderGraphBuilder builder, MaterialExpressionMultiply unrealNode)
         {
-            return new MultiplyNode();
+            return new MultiplyNode() {
+                previewExpanded =  ! unrealNode.Collapsed
+            };
         }
 
         public override int GetConnectionSlotId(AbstractMaterialNode from, AbstractMaterialNode to, int toSlotId, ParsedPropertyBag propertyBag)
