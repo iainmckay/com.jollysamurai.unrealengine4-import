@@ -72,9 +72,9 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
         {
             ConvertUnrealNode(_unrealMaterial);
 
-            IteratorExpressionReferences(_unrealMaterial.EditorComments, ConvertUnrealNode);
-            IteratorExpressionReferences(_unrealMaterial.Expressions, ConvertUnrealNode);
-            IteratorExpressionReferences(_unrealMaterial.Expressions, ConnectUnrealNode);
+            IterateOverExpressionReferences(_unrealMaterial.EditorComments, ConvertUnrealNode);
+            IterateOverExpressionReferences(_unrealMaterial.Expressions, ConvertUnrealNode);
+            IterateOverExpressionReferences(_unrealMaterial.Expressions, ConnectUnrealNode);
 
             ConnectUnrealNode(_unrealMaterial);
 
@@ -85,7 +85,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
 
         private delegate void ExpressionReferenceCallback(T3D.Node node);
 
-        private void IteratorExpressionReferences(ExpressionReference[] references, ExpressionReferenceCallback callback)
+        private void IterateOverExpressionReferences(ExpressionReference[] references, ExpressionReferenceCallback callback)
         {
             if(null == references) {
                 return;
