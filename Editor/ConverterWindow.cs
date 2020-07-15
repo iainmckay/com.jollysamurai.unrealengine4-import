@@ -11,6 +11,7 @@ using JollySamurai.UnrealEngine4.T3D.Material;
 using JollySamurai.UnrealEngine4.T3D.Parser;
 using UnityEditor;
 using UnityEditor.ShaderGraph.Internal;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Material = UnityEngine.Material;
@@ -125,9 +126,8 @@ namespace JollySamurai.UnrealEngine4.Import
                 }
             };
 
-            // FIXME: remove
-            input.value = "C:/Users/Iain/Desktop/Test";
-            // input.value = "/home/iain/Seafile/Test";
+            input.value = EditorPrefs.GetString(viewKeyPrefix + labelText);
+            input.RegisterValueChangedCallback(evt => EditorPrefs.SetString(viewKeyPrefix + labelText, evt.newValue));
 
             input.contentContainer.Add(inputBrowserButton);
             row.Add(input);
@@ -156,9 +156,8 @@ namespace JollySamurai.UnrealEngine4.Import
                 }
             };
 
-            // FIXME: remove
-            input.value = "D:/ConverterProject/Assets";
-            // input.value = "/home/iain/Seafile/ConverterProject3/Assets";
+            input.value = EditorPrefs.GetString(viewKeyPrefix + labelText);
+            input.RegisterValueChangedCallback(evt => EditorPrefs.SetString(viewKeyPrefix + labelText, evt.newValue));
 
             input.contentContainer.Add(inputBrowserButton);
             row.Add(input);
