@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 using BlendMode = JollySamurai.UnrealEngine4.T3D.BlendMode;
+using Material = JollySamurai.UnrealEngine4.T3D.Material.Material;
 
 namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters
 {
@@ -25,10 +26,22 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters
                     return AlphaMode.Multiply;
                 case BlendMode.Masked:
                     Debug.Log("FIXME: masked blend mode not supported");
+
                     break;
             }
 
             return AlphaMode.Alpha;
+        }
+
+        public static PBRMasterNode.Model MaterialToModel(Material material)
+        {
+            if(material.Metallic != null) {
+                return PBRMasterNode.Model.Metallic;
+            } else if(material.Specular != null) {
+                return PBRMasterNode.Model.Specular;
+            }
+
+            return PBRMasterNode.Model.Metallic;
         }
     }
 }

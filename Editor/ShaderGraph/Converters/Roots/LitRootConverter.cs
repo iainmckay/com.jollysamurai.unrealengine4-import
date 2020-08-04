@@ -1,8 +1,9 @@
 ﻿using JollySamurai.UnrealEngine4.T3D;
-using JollySamurai.UnrealEngine4.T3D.Material;
 using JollySamurai.UnrealEngine4.T3D.Parser;
 using UnityEditor.ShaderGraph;
 using UnityEditor.ShaderGraph.Drawing.Controls;
+using UnityEngine;
+using Material = JollySamurai.UnrealEngine4.T3D.Material.Material;
 
 namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Roots
 {
@@ -19,6 +20,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Roots
             masterNode.twoSided =  new ToggleData(unrealNode.IsTwoSided);
             masterNode.surfaceType = Helper.BlendModeToSurfaceType(unrealNode.BlendMode);
             masterNode.alphaMode = Helper.BlendModeToAlphaMode(unrealNode.BlendMode);
+            masterNode.model = Helper.MaterialToModel(unrealNode);
 
             return masterNode;
         }
@@ -37,9 +39,12 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Roots
             builder.Connect(unrealNode.Roughness, unrealNode.Name, PBRMasterNode.SmoothnessSlotId);
             builder.Connect(unrealNode.EmissiveColor, unrealNode.Name, PBRMasterNode.EmissionSlotId);
 
-            if(unrealNode.Specular != null) {
-                // FIXME: support specular or at least raise a warning?
-                // builder.Connect(unrealNode.Specular?.NodeName, unrealNode.Name, PBRMasterNode.SpecularSlotId, unrealNode.Specular);
+            if(unrealMaterial.Metallic != null && unrealMaterial.Specular != null) {
+                Debug.Log("FIXME: material supports both metallic and specular but we don't");
+            }
+
+            if (unrealMaterial.Metallic == null && unrealNode.Specular != null) {
+                builder.Connect(unrealNode.Specular, unrealNode.Name, PBRMasterNode.SpecularSlotId);
             }
         }
     }
