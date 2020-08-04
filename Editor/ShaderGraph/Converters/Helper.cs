@@ -1,4 +1,6 @@
-﻿using UnityEditor.ShaderGraph;
+﻿using System.IO;
+using UnityEditor;
+using UnityEditor.ShaderGraph;
 using UnityEngine;
 using UnityEngine.Rendering;
 using BlendMode = JollySamurai.UnrealEngine4.T3D.BlendMode;
@@ -42,6 +44,14 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters
             }
 
             return PBRMasterNode.Model.Metallic;
+        }
+
+        public static Texture2D LoadTexture(string unrealFileName)
+        {
+            // FIXME: hard coded TGA extension and directly loading assets, there must be a quicker way to do this
+            var textureFileName = "Assets" + Path.ChangeExtension(unrealFileName, "tga");
+
+           return AssetDatabase.LoadAssetAtPath<Texture2D>(textureFileName);
         }
     }
 }

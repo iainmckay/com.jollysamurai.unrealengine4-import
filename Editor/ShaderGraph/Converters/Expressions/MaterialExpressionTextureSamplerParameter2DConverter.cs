@@ -1,13 +1,8 @@
-﻿using System;
-using System.IO;
-using JollySamurai.UnrealEngine4.T3D;
+﻿using JollySamurai.UnrealEngine4.T3D;
 using JollySamurai.UnrealEngine4.T3D.Material;
 using JollySamurai.UnrealEngine4.T3D.Parser;
-using UnityEditor;
 using UnityEditor.ShaderGraph;
 using UnityEditor.ShaderGraph.Internal;
-using UnityEngine;
-using Material = JollySamurai.UnrealEngine4.T3D.Material.Material;
 using TextureType = UnityEditor.ShaderGraph.TextureType;
 
 namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
@@ -23,9 +18,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
         {
             return builder.FindOrCreateProperty<Texture2DShaderProperty>(parameterNode.ParameterName, (p) => {
                 // FIXME: don't use unresolved reference directly and don't guess the extension
-                var textureFileName = "Assets" + Path.ChangeExtension(parameterNode.Texture.FileName, "tga");
-
-                p.value.texture = AssetDatabase.LoadAssetAtPath<Texture2D>(textureFileName);
+                p.value.texture = Helper.LoadTexture(parameterNode.Texture.FileName);
             });
         }
 
@@ -36,19 +29,16 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
 
             builder.PositionNodeOnGraph(propertyNode, unrealNode);
 
-            if (unrealNode.SamplerType == SamplerType.Normal) {
-              sampleNode.textureType = TextureType.Normal;
-            } else if (unrealNode.SamplerType == SamplerType.Default) {
-              sampleNode.textureType = TextureType.Default;
+            if(unrealNode.SamplerType == SamplerType.Normal) {
+                sampleNode.textureType = TextureType.Normal;
+            } else if(unrealNode.SamplerType == SamplerType.Default) {
+                sampleNode.textureType = TextureType.Default;
             } else {
-              // FIXME:
-              throw new System.Exception("unhandled texture type");
+                // FIXME:
+                throw new System.Exception("unhandled texture type");
             }
 
-            builder.Connect(
-                propertyNode.GetSlotReference(PropertyNode.OutputSlotId),
-                sampleNode.GetSlotReference(SampleTexture2DNode.TextureInputId)
-            );
+            builder.Connect(propertyNode.GetSlotReference(PropertyNode.OutputSlotId), sampleNode.GetSlotReference(SampleTexture2DNode.TextureInputId));
 
             return sampleNode;
         }
@@ -60,16 +50,16 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
             var hasB = propertyBag.HasProperty("MaskB");
             var hasA = propertyBag.HasProperty("MaskA");
 
-            if (hasR && hasG && hasB && hasA) {
+            if(hasR && hasG && hasB && hasA) {
                 return SampleTexture2DNode.OutputSlotRGBAId;
-            }  else if (hasR && hasG && hasB) {
+            } else if(hasR && hasG && hasB) {
                 // should this be only RGB instead?
                 return SampleTexture2DNode.OutputSlotRGBAId;
-            } else if (hasR) {
+            } else if(hasR) {
                 return SampleTexture2DNode.OutputSlotRId;
-            } else if (hasG) {
+            } else if(hasG) {
                 return SampleTexture2DNode.OutputSlotGId;
-            } else if (hasB) {
+            } else if(hasB) {
                 return SampleTexture2DNode.OutputSlotBId;
             }
 
