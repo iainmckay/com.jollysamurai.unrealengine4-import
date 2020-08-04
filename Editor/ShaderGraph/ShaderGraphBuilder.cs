@@ -53,6 +53,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
             AddNodeConverter(new MaterialExpressionOneMinusConverter());
             AddNodeConverter(new MaterialExpressionScalarParameterConverter());
             AddNodeConverter(new MaterialExpressionStaticSwitchParameterConverter());
+            AddNodeConverter(new MaterialExpressionSubtractConverter());
             AddNodeConverter(new MaterialExpressionTextureCoordinateConverter());
             AddNodeConverter(new MaterialExpressionTextureSampleParameter2DConverter());
             AddNodeConverter(new MaterialExpressionVectorParameterConverter());
