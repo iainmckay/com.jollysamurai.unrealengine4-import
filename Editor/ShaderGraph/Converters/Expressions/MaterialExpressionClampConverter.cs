@@ -29,8 +29,14 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
         public override void CreateConnections(MaterialExpressionClamp unrealNode, Material unrealMaterial, ShaderGraphBuilder builder)
         {
             builder.Connect(unrealNode.Input, unrealNode.Name, 0);
-            builder.Connect(unrealNode.Min, unrealNode.Name, 1);
-            builder.Connect(unrealNode.Max, unrealNode.Name, 2);
+
+            if(unrealNode.Min != null) {
+                builder.Connect(unrealNode.Min, unrealNode.Name, 1);
+            }
+
+            if(unrealNode.Max != null) {
+                builder.Connect(unrealNode.Max, unrealNode.Name, 2);
+            }
         }
     }
 }
