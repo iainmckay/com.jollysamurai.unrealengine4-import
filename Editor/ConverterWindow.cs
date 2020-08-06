@@ -93,6 +93,8 @@ namespace JollySamurai.UnrealEngine4.Import
                     }
                 }
             };
+
+            UpdateButtonState(button, input, output);
         }
 
         private TextField AddInput(VisualElement container, string labelText, bool enableMultiSelect, string viewKeyPrefix)
