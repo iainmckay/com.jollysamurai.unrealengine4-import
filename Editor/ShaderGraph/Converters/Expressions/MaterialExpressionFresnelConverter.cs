@@ -18,9 +18,11 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
 
         protected override AbstractMaterialNode CreateNode(ShaderGraphBuilder builder, MaterialExpressionFresnel unrealNode)
         {
-            return new FresnelNode() {
+            var node = new FresnelNode() {
                 previewExpanded = false,
             };
+
+            return node;
         }
 
         public override int GetConnectionSlotId(AbstractMaterialNode from, AbstractMaterialNode to, int toSlotId, ParsedPropertyBag propertyBag)
@@ -30,12 +32,16 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
 
         public override void CreateConnections(MaterialExpressionFresnel unrealNode, Material unrealMaterial, ShaderGraphBuilder builder)
         {
-            if(unrealNode.ExponentIn != null) {
-                builder.Connect(unrealNode.ExponentIn, unrealNode.Name, 0);
+            if(unrealNode.Normal != null) {
+                builder.Connect(unrealNode.Normal, unrealNode.Name, 0);
             }
 
             if(unrealNode.BaseReflectFractionIn != null) {
-                Debug.Log("FIXME: unhandled fresnel baseReflectFractionIn");
+                Debug.Log("FIXME: unhandled fresnel baseReflectFractionIn/baseReflectFraction");
+            }
+
+            if(unrealNode.ExponentIn != null) {
+                Debug.Log("FIXME: unhandled fresnel exponentIn/exponent");
             }
 
             if(unrealNode.Power != null) {
