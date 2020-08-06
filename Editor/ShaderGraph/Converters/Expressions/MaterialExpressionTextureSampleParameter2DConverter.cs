@@ -26,18 +26,9 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
         {
             var propertyNode = base.CreateNodeForShaderInput(shaderInput, builder, unrealNode);
             var sampleNode = builder.CreateNode<SampleTexture2DNode>();
+            sampleNode.textureType = TextureType.Default;
 
             builder.PositionNodeOnGraph(propertyNode, unrealNode);
-
-            if(unrealNode.SamplerType == SamplerType.Normal) {
-                sampleNode.textureType = TextureType.Normal;
-            } else if(unrealNode.SamplerType == SamplerType.Default) {
-                sampleNode.textureType = TextureType.Default;
-            } else {
-                // FIXME:
-                throw new System.Exception("unhandled texture type");
-            }
-
             builder.Connect(propertyNode.GetSlotReference(PropertyNode.OutputSlotId), sampleNode.GetSlotReference(SampleTexture2DNode.TextureInputId));
 
             return sampleNode;
