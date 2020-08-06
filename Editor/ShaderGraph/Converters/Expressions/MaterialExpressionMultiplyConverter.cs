@@ -1,9 +1,10 @@
-﻿using System;
-using JollySamurai.UnrealEngine4.T3D;
+﻿using JollySamurai.UnrealEngine4.T3D;
 using JollySamurai.UnrealEngine4.T3D.Material;
 using JollySamurai.UnrealEngine4.T3D.Parser;
 using UnityEditor.ShaderGraph;
-using UnityEditor.ShaderGraph.Internal;
+using UnityEngine;
+using Material = JollySamurai.UnrealEngine4.T3D.Material.Material;
+using Vector4 = UnityEngine.Vector4;
 
 namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
 {
@@ -16,9 +17,19 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
 
         protected override AbstractMaterialNode CreateNode(ShaderGraphBuilder builder, MaterialExpressionMultiply unrealNode)
         {
-            return new MultiplyNode() {
+            var node = new MultiplyNode() {
                 previewExpanded =  ! unrealNode.Collapsed
             };
+
+            if(unrealNode.A == null) {
+                node.FindInputSlot<DynamicValueMaterialSlot>(0).value = new Matrix4x4(new Vector4(unrealNode.ConstA, 0), Vector4.zero, Vector4.zero, Vector4.zero);
+            }
+
+            if(unrealNode.B == null) {
+                node.FindInputSlot<DynamicValueMaterialSlot>(1).value = new Matrix4x4(new Vector4(unrealNode.ConstB, 0), Vector4.zero, Vector4.zero, Vector4.zero);
+            }
+
+            return node;
         }
 
         public override int GetConnectionSlotId(AbstractMaterialNode from, AbstractMaterialNode to, int toSlotId, ParsedPropertyBag propertyBag)
@@ -28,8 +39,13 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
 
         public override void CreateConnections(MaterialExpressionMultiply unrealNode, Material unrealMaterial, ShaderGraphBuilder builder)
         {
-            builder.Connect(unrealNode.A, unrealNode.Name, 0);
-            builder.Connect(unrealNode.B, unrealNode.Name, 1);
+            if(unrealNode.A != null) {
+                builder.Connect(unrealNode.A, unrealNode.Name, 0);
+            }
+
+            if(unrealNode.B != null) {
+                builder.Connect(unrealNode.B, unrealNode.Name, 1);
+            }
         }
     }
 }

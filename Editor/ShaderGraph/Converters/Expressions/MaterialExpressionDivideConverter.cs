@@ -1,9 +1,8 @@
-﻿using System;
-using JollySamurai.UnrealEngine4.T3D;
+﻿using JollySamurai.UnrealEngine4.T3D;
 using JollySamurai.UnrealEngine4.T3D.Material;
 using JollySamurai.UnrealEngine4.T3D.Parser;
 using UnityEditor.ShaderGraph;
-using UnityEditor.ShaderGraph.Internal;
+using Vector4 = UnityEngine.Vector4;
 
 namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
 {
@@ -16,9 +15,19 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
 
         protected override AbstractMaterialNode CreateNode(ShaderGraphBuilder builder, MaterialExpressionDivide unrealNode)
         {
-            return new DivideNode() {
+            var node = new DivideNode() {
                 previewExpanded = false,
             };
+
+            if(unrealNode.A == null) {
+                node.FindInputSlot<DynamicVectorMaterialSlot>(0).value = new Vector4(unrealNode.ConstA, 0);
+            }
+
+            if(unrealNode.B == null) {
+                node.FindInputSlot<DynamicVectorMaterialSlot>(1).value = new Vector4(unrealNode.ConstB, 0);
+            }
+
+            return node;
         }
 
         public override int GetConnectionSlotId(AbstractMaterialNode from, AbstractMaterialNode to, int toSlotId, ParsedPropertyBag propertyBag)
@@ -28,8 +37,13 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
 
         public override void CreateConnections(MaterialExpressionDivide unrealNode, Material unrealMaterial, ShaderGraphBuilder builder)
         {
-            builder.Connect(unrealNode.A, unrealNode.Name, 0);
-            builder.Connect(unrealNode.B, unrealNode.Name, 1);
+            if(unrealNode.A != null) {
+                builder.Connect(unrealNode.A, unrealNode.Name, 0);
+            }
+
+            if(unrealNode.B != null) {
+                builder.Connect(unrealNode.B, unrealNode.Name, 1);
+            }
         }
     }
 }
