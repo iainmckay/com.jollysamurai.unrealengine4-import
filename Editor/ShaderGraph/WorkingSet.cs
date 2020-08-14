@@ -115,6 +115,8 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
         {
             var resultSetBuilder = new ResultSetBuilder();
 
+            AssetDatabase.StartAssetEditing();
+
             for (var i = 0; i < _materialList.Count; i++) {
                 var document = _materialList[i];
                 var processor = new MaterialDocumentProcessor();
@@ -140,6 +142,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
                 File.WriteAllText(outputPath, content, Encoding.UTF8);
             }
 
+            AssetDatabase.StopAssetEditing();
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
 
             return resultSetBuilder.ToResultSet();
@@ -149,8 +152,22 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
         {
             var resultSetBuilder = new ResultSetBuilder();
 
+            AssetDatabase.StartAssetEditing();
             CreateMaterialsForShaderGraphs(resultSetBuilder);
+            AssetDatabase.StopAssetEditing();
+
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
+
+            return resultSetBuilder.ToResultSet();
+        }
+
+        public ResultSet CreateMaterialInstances()
+        {
+            var resultSetBuilder = new ResultSetBuilder();
+
+            AssetDatabase.StartAssetEditing();
             CreateMaterialsForInstances(resultSetBuilder);
+            AssetDatabase.StopAssetEditing();
 
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
 
@@ -190,6 +207,14 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
             }
         }
 
+        private string FindNameFromParameterInfo(ParsedPropertyBag parameter)
+        {
+            // FIXME: this should be handled by the parser
+            var tmpBag = ValueUtil.ParseAttributeList(parameter.FindPropertyValue("ParameterInfo"));
+
+            return tmpBag.FindPropertyValue("Name");
+        }
+
         private void CreateMaterialsForInstances(ResultSetBuilder resultSetBuilder)
         {
             for (var i = 0; i < _materialInstanceList.Count; i++) {
@@ -214,10 +239,10 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
                 }
 
                 var graphData = JsonUtility.FromJson<GraphData>(File.ReadAllText(shaderPath));
-                var materialAsset = new UnityEngine.Material(shaderAsset);
+                var materialAsset = new Material(shaderAsset);
 
                 foreach (var parameter in materialInstance.ScalarParameters) {
-                    var parameterName = parameter.FindPropertyValue("ParameterName");
+                    var parameterName = parameter.FindPropertyValue("ParameterName") ?? FindNameFromParameterInfo(parameter);
                     var parameterValue = ValueUtil.ParseFloat(parameter.FindPropertyValue("ParameterValue") ?? "1.0");
 
                     if(graphData.properties.Any(p => p.displayName == parameterName)) {
@@ -227,14 +252,25 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
                     }
                 }
 
-                foreach (var parameter in materialInstance.TextureParameters) {
-                    var parameterName = parameter.FindPropertyValue("ParameterName");
-                    var parameterValue = ValueUtil.ParseTextureReference(parameter.FindPropertyValue("ParameterValue"));
+                foreach (var parameter in materialInstance.VectorParameters) {
+                    var parameterName = parameter.FindPropertyValue("ParameterName") ?? FindNameFromParameterInfo(parameter);
+                    var parameterValue = ValueUtil.ParseVector4(parameter.FindPropertyValue("ParameterValue") ?? "(R=0.0,G=0.0,B=0.0,A=1.0)");
 
                     if(graphData.properties.Any(p => p.displayName == parameterName)) {
                         var parameterReference = graphData.properties.First(p => p.displayName == parameterName).referenceName;
 
-                        var textureAssetPath = "Assets" + Path.ChangeExtension(parameterValue.FileName, "tga");
+                        materialAsset.SetVector(parameterReference, new Vector4(parameterValue.X, parameterValue.Y, parameterValue.Z, parameterValue.A));
+                    }
+                }
+
+                foreach (var parameter in materialInstance.TextureParameters) {
+                    var parameterName = parameter.FindPropertyValue("ParameterName") ?? FindNameFromParameterInfo(parameter);
+                    var parameterValue = ValueUtil.ParseResourceReference(parameter.FindPropertyValue("ParameterValue"));
+
+                    if(graphData.properties.Any(p => p.displayName == parameterName)) {
+                        var parameterReference = graphData.properties.First(p => p.displayName == parameterName).referenceName;
+
+                        var textureAssetPath = "Assets" + Path.ChangeExtension(parameterValue.FileName, "TGA");
                         var textureAsset = AssetDatabase.LoadAssetAtPath<Texture>(textureAssetPath);
 
                         materialAsset.SetTexture(parameterReference, textureAsset);
@@ -244,17 +280,9 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
                 var outputPath = MakeOutputPathForMaterial(instanceDocument, true);
 
                 Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
+
                 AssetDatabase.CreateAsset(materialAsset, outputPath);
             }
-        }
-
-        private void CreateMaterialAsset()
-        {
-            // var materialAsset = new UnityEngine.Material(shaderAsset);
-            // var outputPath = MakeOutputPathForMaterial(document, true);
-            //
-            // Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
-            // AssetDatabase.CreateAsset(materialAsset, outputPath);
         }
 
         private string MakeRelativePath(string input, string path)
