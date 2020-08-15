@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
 {
-    public class MaterialExpressionCommentConverter : UnrealNodeConverter<MaterialExpressionComment>
+    public class MaterialExpressionCommentConverter : MaterialNodeConverter<MaterialExpressionComment>
     {
         public override bool CanConvert(Node unrealNode)
         {

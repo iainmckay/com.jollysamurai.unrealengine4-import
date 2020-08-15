@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using JollySamurai.UnrealEngine4.Import.Exception;
 using JollySamurai.UnrealEngine4.T3D;
 using JollySamurai.UnrealEngine4.T3D.Exception;
@@ -14,7 +12,8 @@ using UnityEditor;
 using UnityEditor.ShaderGraph;
 using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
-using Material = JollySamurai.UnrealEngine4.T3D.Material.Material;
+using Material = UnityEngine.Material;
+using Vector4 = UnityEngine.Vector4;
 
 namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
 {
@@ -34,7 +33,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
         private readonly List<ParsedDocument> _materialList = new List<ParsedDocument>();
         private readonly List<ParsedDocument> _materialInstanceList = new List<ParsedDocument>();
 
-        public event StepDelegate Step;
+        public event BaseConverterWindow.StepDelegate Step;
 
         public WorkingSet(string[] selection, string inputDirectory, string outputDirectory)
         {
@@ -60,12 +59,14 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
                     var document = ParsedDocument.From(file, content);
                     var classValue = document.RootNode.FindAttributeValue("Class");
 
+                    if(document.RootNode.SectionType != "Object") {
+                        continue;
+                    }
+
                     if(classValue == "/Script/Engine.Material") {
                         _materialList.Add(document);
                     } else if(classValue == "/Script/Engine.MaterialInstanceConstant") {
                         _materialInstanceList.Add(document);
-                    } else {
-                        resultSetBuilder.AddProblem(ProblemSeverity.Warning, file, $"Encountered unhandled Unreal type \"{classValue}\" in \"{file}\"");
                     }
                 } catch (ParserException ex) {
                     resultSetBuilder.AddProblem(ProblemSeverity.Fatal, file, ex.Message);
@@ -191,7 +192,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
                 var graphData = JsonUtility.FromJson<GraphData>(File.ReadAllText(shaderPath));
                 var textureProperties = graphData.properties.Where(p => p.propertyType == PropertyType.Texture2D || p.propertyType == PropertyType.Texture3D);
 
-                var materialAsset = new UnityEngine.Material(shaderAsset);
+                var materialAsset = new Material(shaderAsset);
                 var outputPath = MakeOutputPathForMaterial(document, true);
 
                 foreach (var shaderProperty in textureProperties) {
@@ -319,7 +320,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
 
         private void RaiseStepEvent(string fileName, int index)
         {
-            var args = new StepEventArgs(fileName, index);
+            var args = new BaseConverterWindow.StepEventArgs(fileName, index);
 
             Step?.Invoke(args);
 
@@ -328,103 +329,5 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
             }
         }
 
-        public delegate void StepDelegate(StepEventArgs args);
-
-        public class StepEventArgs : EventArgs
-        {
-            public string FileName { get; }
-            public int Index { get; }
-            public bool Cancel { get; set; }
-
-            public StepEventArgs(string fileName, int index)
-            {
-                FileName = fileName;
-                Index = index;
-            }
-        }
-
-        public class ResultSetBuilder
-        {
-            public bool HasErrors {
-                get { return _hasErrors; }
-            }
-
-            public bool HasWarnings {
-                get { return _hasWarnings; }
-            }
-
-            private List<Problem> _problems = new List<Problem>();
-            private bool _hasErrors;
-            private bool _hasWarnings;
-
-            public void AddProblem(ProblemSeverity severity, string fileName, string message)
-            {
-                _problems.Add(new Problem(severity, fileName, message));
-
-                if(severity == ProblemSeverity.Fatal) {
-                    _hasErrors = true;
-                } else if(severity == ProblemSeverity.Warning) {
-                    _hasWarnings = true;
-                }
-            }
-
-            public void AddProcessorProblems(T3D.Processor.Problem[] resultProblems, string documentFileName)
-            {
-                foreach (var resultProblem in resultProblems) {
-                    AddProblem(TranslateSeverity(resultProblem.Severity), documentFileName, resultProblem.Message);
-                }
-            }
-
-            public ResultSet ToResultSet()
-            {
-                return new ResultSet(_problems.ToArray(), _hasErrors, _hasWarnings);
-            }
-
-            private ProblemSeverity TranslateSeverity(T3D.Processor.ProblemSeverity severity)
-            {
-                switch (severity) {
-                    case T3D.Processor.ProblemSeverity.Error:
-                        return ProblemSeverity.Fatal;
-                    case T3D.Processor.ProblemSeverity.Warning:
-                        return ProblemSeverity.Warning;
-                }
-
-                throw new System.Exception("Unexpected severity");
-            }
-        }
-
-        public class ResultSet
-        {
-            public Problem[] Problems { get; }
-            public bool HasErrors { get; }
-            public bool HasWarnings { get; }
-
-            internal ResultSet(Problem[] problems, bool hasErrors, bool hasWarnings)
-            {
-                Problems = problems;
-                HasErrors = hasErrors;
-                HasWarnings = hasWarnings;
-            }
-        }
-
-        public class Problem
-        {
-            public ProblemSeverity Severity { get; }
-            public string FileName { get; }
-            public string Message { get; }
-
-            public Problem(ProblemSeverity severity, string fileName, string message)
-            {
-                Severity = severity;
-                FileName = fileName;
-                Message = message;
-            }
-        }
-
-        public enum ProblemSeverity
-        {
-            Fatal,
-            Warning
-        }
     }
 }

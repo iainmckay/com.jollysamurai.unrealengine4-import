@@ -6,7 +6,7 @@ using UnityEditor.ShaderGraph.Internal;
 
 namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters
 {
-    public abstract class GenericParameterConverter<T, U> : UnrealNodeConverter<U>
+    public abstract class GenericParameterConverter<T, U> : MaterialNodeConverter<U>
         where T : AbstractShaderProperty
         where U : ParameterNode
     {

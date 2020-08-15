@@ -20,7 +20,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
 
         private readonly Dictionary<string, ShaderInputLookup> _propertyLookup;
         private readonly Dictionary<string, AbstractMaterialNode> _nodeLookupByUnrealNodeName;
-        private readonly List<UnrealNodeConverter> _nodeConverters;
+        private readonly List<MaterialNodeConverter> _nodeConverters;
 
         private readonly Dictionary<Guid, Rect> _groupDimensions;
 
@@ -30,7 +30,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
             _graph = new GraphData();
             _propertyLookup = new Dictionary<string, ShaderInputLookup>();
             _nodeLookupByUnrealNodeName = new Dictionary<string, AbstractMaterialNode>();
-            _nodeConverters = new List<UnrealNodeConverter>();
+            _nodeConverters = new List<MaterialNodeConverter>();
             _groupDimensions = new Dictionary<Guid, Rect>();
 
             AddBuiltinConverters();
@@ -72,7 +72,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
             AddNodeConverter(new UnlitRootConverter());
         }
 
-        private void AddNodeConverter(UnrealNodeConverter converter)
+        private void AddNodeConverter(MaterialNodeConverter converter)
         {
             _nodeConverters.Add(converter);
         }
@@ -126,7 +126,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
             converter?.CreateConnections(unrealNode, _unrealMaterial, this);
         }
 
-        public UnrealNodeConverter FindConverterForUnrealNode(T3D.Node unrealNode)
+        public MaterialNodeConverter FindConverterForUnrealNode(T3D.Node unrealNode)
         {
             foreach (var converter in _nodeConverters) {
                 if(converter.CanConvert(unrealNode)) {

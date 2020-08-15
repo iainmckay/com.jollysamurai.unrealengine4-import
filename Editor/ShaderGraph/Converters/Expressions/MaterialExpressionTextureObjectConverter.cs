@@ -1,9 +1,7 @@
-﻿using System;
-using JollySamurai.UnrealEngine4.T3D;
+﻿using JollySamurai.UnrealEngine4.T3D;
 using JollySamurai.UnrealEngine4.T3D.Material;
 using JollySamurai.UnrealEngine4.T3D.Parser;
 using UnityEditor.ShaderGraph;
-using UnityEditor.ShaderGraph.Internal;
 
 namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
 {
