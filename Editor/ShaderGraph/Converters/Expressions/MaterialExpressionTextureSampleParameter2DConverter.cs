@@ -53,8 +53,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Expressions
                 return SampleTexture2DNode.OutputSlotBId;
             }
 
-            // FIXME:
-            throw new System.Exception("unhandled scenario");
+            return SampleTexture2DNode.OutputSlotRGBAId;
         }
 
         public override void CreateConnections(MaterialExpressionTextureSampleParameter2D unrealNode, Material unrealMaterial, ShaderGraphBuilder builder)

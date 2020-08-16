@@ -35,7 +35,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Roots
             builder.Connect(unrealNode.BaseColor, unrealNode.Name, PBRMasterNode.AlbedoSlotId);
             builder.Connect(unrealNode.Metallic, unrealNode.Name, PBRMasterNode.MetallicSlotId);
             builder.Connect(unrealNode.Normal, unrealNode.Name, PBRMasterNode.NormalSlotId);
-            builder.Connect(unrealNode.Opacity, unrealNode.Name, PBRMasterNode.AlphaSlotId);
+            builder.Connect(unrealNode.OpacityMask, unrealNode.Name, PBRMasterNode.AlphaSlotId);
             builder.Connect(unrealNode.Roughness, unrealNode.Name, PBRMasterNode.SmoothnessSlotId);
             builder.Connect(unrealNode.EmissiveColor, unrealNode.Name, PBRMasterNode.EmissionSlotId);
 

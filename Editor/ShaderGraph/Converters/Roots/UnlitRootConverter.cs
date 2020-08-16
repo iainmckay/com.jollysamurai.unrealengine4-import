@@ -31,7 +31,7 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph.Converters.Roots
         public override void CreateConnections(Material unrealNode, Material unrealMaterial, ShaderGraphBuilder builder)
         {
             builder.Connect(unrealNode.EmissiveColor, unrealNode.Name, UnlitMasterNode.ColorSlotId);
-            builder.Connect(unrealNode.Opacity, unrealNode.Name, UnlitMasterNode.AlphaSlotId);
+            builder.Connect(unrealNode.OpacityMask, unrealNode.Name, UnlitMasterNode.AlphaSlotId);
 
             if(unrealNode.Specular != null) {
                 // FIXME: support specular or at least raise a warning?

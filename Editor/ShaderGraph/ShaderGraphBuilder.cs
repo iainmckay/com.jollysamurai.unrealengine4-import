@@ -215,6 +215,15 @@ namespace JollySamurai.UnrealEngine4.Import.ShaderGraph
             Connect(expression.NodeName, toUnrealNodeName, toSlotId, propertyBag);
         }
 
+        public void Connect(ExpressionReference expression, string toUnrealNodeName, int toSlotId)
+        {
+            if(null == expression) {
+                return;
+            }
+
+            Connect(expression.NodeName, toUnrealNodeName, toSlotId, ParsedPropertyBag.Empty);
+        }
+
         public void Connect(string fromUnrealNodeName, string toUnrealNodeName, int toSlotId, ParsedPropertyBag propertyBag)
         {
             var fromNode = FindNodeByUnrealName(fromUnrealNodeName);
