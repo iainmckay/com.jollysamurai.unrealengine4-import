@@ -8,6 +8,7 @@ using UnityEngine.Rendering;
 using BlendMode = JollySamurai.UnrealEngine4.T3D.BlendMode;
 using Material = JollySamurai.UnrealEngine4.T3D.Material.Material;
 using Vector3 = UnityEngine.Vector3;
+using Vector4 = JollySamurai.UnrealEngine4.T3D.Vector4;
 
 namespace JollySamurai.UnrealEngine4.Import
 {
@@ -79,17 +80,16 @@ namespace JollySamurai.UnrealEngine4.Import
             return AssetDatabase.LoadAssetAtPath<UnityEngine.Material>(GetMaterialPath(unrealFileName));
         }
 
-        public static Vector3 ConvertUnrealVector3(T3D.Vector3 v, bool applyScaling = false, bool applyAbsolute = false)
+        public static Vector3 ConvertUnrealVector3(T3D.Vector3 v, bool applyScaling = false)
         {
-            applyAbsolute = false;
-            var x = applyAbsolute ? Math.Abs(v.X) : v.X;
-            var y = applyAbsolute ? Math.Abs(v.Y) : v.Y;
-            var z = applyAbsolute ? Math.Abs(v.Z) : v.Z;
+            var x = v.X;
+            var y = v.Y;
+            var z = v.Z;
 
             if(applyScaling) {
-                x /= 100.0f;
-                y /= 100.0f;
-                z /= 100.0f;
+                x = ScaleUnit(x);
+                y = ScaleUnit(y);
+                z = ScaleUnit(z);
             }
 
             return new Vector3(y, z, x);
@@ -98,12 +98,19 @@ namespace JollySamurai.UnrealEngine4.Import
         public static Quaternion ConvertUnrealRotator(Rotator rotation)
         {
             var q =  Quaternion.Euler(rotation.Pitch, rotation.Yaw, rotation.Roll);
-
-            // ue4 rotators can extend past +/- 360 so let the quaternion wrap before adjusting
             q = Quaternion.Euler(q.eulerAngles.x, q.eulerAngles.y - 180f, q.eulerAngles.z);
-            // q = new Quaternion(q.x, -q.y, q.z, q.w);
 
             return q;
+        }
+
+        public static float ScaleUnit(float value)
+        {
+            return value / 100.0f;
+        }
+
+        public static Color ConvertUnrealColor(Vector4 value)
+        {
+            return new Color(value.X / 255f, value.Y / 255f, value.Z / 255f, value.A / 255f);
         }
     }
 }

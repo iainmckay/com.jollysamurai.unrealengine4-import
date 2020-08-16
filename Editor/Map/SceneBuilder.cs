@@ -25,8 +25,12 @@ namespace JollySamurai.UnrealEngine4.Import.Map
 
         private void AddBuiltinConverters()
         {
+            AddConverter(new PointLightActorConverter());
+            AddConverter(new SpotLightActorConverter());
             AddConverter(new StaticMeshActorConverter());
 
+            AddConverter(new PointLightComponentConverter());
+            AddConverter(new SpotLightComponentConverter());
             AddConverter(new StaticMeshComponentConverter());
         }
 

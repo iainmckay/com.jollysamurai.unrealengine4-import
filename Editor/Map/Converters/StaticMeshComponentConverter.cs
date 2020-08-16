@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using JollySamurai.UnrealEngine4.T3D;
 using JollySamurai.UnrealEngine4.T3D.Map;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace JollySamurai.UnrealEngine4.Import.Map.Converters
@@ -22,8 +21,7 @@ namespace JollySamurai.UnrealEngine4.Import.Map.Converters
             containingGameObject.transform.localPosition = Helper.ConvertUnrealVector3(unrealNode.Location, true);
             containingGameObject.transform.localRotation = Helper.ConvertUnrealRotator(unrealNode.Rotation);
 
-            // FIXME: this is most definitely wrong but when scales are inverted nothing ever works so we drop the sign
-            containingGameObject.transform.localScale = Helper.ConvertUnrealVector3(unrealNode.Scale3D, false, true);
+            containingGameObject.transform.localScale = Helper.ConvertUnrealVector3(unrealNode.Scale3D, false);
 
             var meshRenderer = containingGameObject.GetComponent<MeshRenderer>();
 
